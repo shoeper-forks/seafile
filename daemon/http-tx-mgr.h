@@ -81,6 +81,8 @@ struct _HttpTxTask {
     int state;
     int runtime_state;
     int error;
+    /* Used to signify stop transfer for all threads. */
+    gboolean all_stop;
 
     /* For upload progress */
     int n_blocks;

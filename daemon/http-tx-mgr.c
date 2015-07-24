@@ -3513,7 +3513,7 @@ get_block_callback (void *ptr, size_t size, size_t nmemb, void *userp)
     HttpTxTask *task = data->task;
     size_t n;
 
-    if (task->state == HTTP_TASK_STATE_CANCELED)
+    if (task->state == HTTP_TASK_STATE_CANCELED || task->all_stop)
         return 0;
 
     n = seaf_block_manager_write_block (seaf->block_mgr,
