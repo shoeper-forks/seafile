@@ -27,6 +27,8 @@
 #include "seafile-session.h"
 #include "access-file.h"
 #include "pack-dir.h"
+#include "http-status-codes.h"
+
 
 #define FILE_TYPE_MAP_DEFAULT_LEN 1
 #define BUFFER_SIZE 1024 * 64
@@ -1124,6 +1126,7 @@ access_cb(evhtp_request_t *req, void *arg)
     const char *user = NULL;
     const char *byte_ranges = NULL;
 
+    int err_code = EVHTP_RES_BADREQ;
     GError *err = NULL;
     SeafileCryptKey *key = NULL;
     SeafileWebAccess *webaccess = NULL;
@@ -1197,6 +1200,7 @@ access_cb(evhtp_request_t *req, void *arg)
         key = seaf_passwd_manager_get_decrypt_key (seaf->passwd_mgr,
                                                    repo_id, user);
         if (!key) {
+            err_code = SEAF_HTTP_RES_REPO_PASSWD_REQUIRED;
             error = "Repo is encrypted. Please provide password to view it.";
             goto bad_req;
         }
@@ -1245,7 +1249,7 @@ bad_req:
         g_object_unref (webaccess);
 
     evbuffer_add_printf(req->buffer_out, "%s\n", error);
-    evhtp_send_reply(req, EVHTP_RES_BADREQ);
+    evhtp_send_reply(req, err_code);
 }
 
 static int

@@ -25,6 +25,8 @@
 #include "seafile-session.h"
 #include "upload-file.h"
 #include "http-status-codes.h"
+#include "seafile-error.h"
+
 
 enum RecvState {
     RECV_INIT,
@@ -41,6 +43,7 @@ enum UploadError {
     ERROR_QUOTA,
     ERROR_RECV,
     ERROR_INTERNAL,
+    ERROR_PASSWORD_REQUIRED,
 };
 
 typedef struct Progress {
@@ -440,6 +443,8 @@ upload_api_cb(evhtp_request_t *req, void *arg)
         if (error) {
             if (error->code == POST_FILE_ERR_FILENAME) {
                 error_code = ERROR_FILENAME;
+            } else if (error->code == SEAF_ERR_REPO_PASSWD_REQUIRED) {
+                error_code = ERROR_PASSWORD_REQUIRED;
             }
             g_clear_error (&error);
         }
@@ -473,6 +478,10 @@ error:
         break;
     case ERROR_QUOTA:
         send_error_reply (req, SEAF_HTTP_RES_NOQUOTA, "Out of quota.\n");
+        break;
+    case ERROR_PASSWORD_REQUIRED:
+        send_error_reply (req, SEAF_HTTP_RES_REPO_PASSWD_REQUIRED,
+                          "Repo password required.\n");
         break;
     case ERROR_RECV:
     case ERROR_INTERNAL:
@@ -939,6 +948,8 @@ update_api_cb(evhtp_request_t *req, void *arg)
         if (error) {
             if (g_strcmp0 (error->message, "file does not exist") == 0) {
                 error_code = ERROR_NOT_EXIST;
+            } else if (error->code == SEAF_ERR_REPO_PASSWD_REQUIRED) {
+                error_code = ERROR_PASSWORD_REQUIRED;
             }
             g_clear_error (&error);
         }
@@ -968,6 +979,10 @@ error:
         break;
     case ERROR_NOT_EXIST:
         send_error_reply (req, SEAF_HTTP_RES_NOT_EXISTS, "File does not exist.\n");
+        break;
+    case ERROR_PASSWORD_REQUIRED:
+        send_error_reply (req, SEAF_HTTP_RES_REPO_PASSWD_REQUIRED,
+                          "Repo password required.\n");
         break;
     case ERROR_RECV:
     case ERROR_INTERNAL:

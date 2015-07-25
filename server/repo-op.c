@@ -27,6 +27,7 @@
 #include "monitor-rpc-wrappers.h"
 
 #include "seaf-db.h"
+#include "seafile-error.h"
 
 #define INDEX_DIR "index"
 
@@ -651,7 +652,7 @@ seaf_repo_manager_post_file (SeafRepoManager *mgr,
                                                      repo_id, user,
                                                      key, iv) < 0) {
             seaf_warning ("Passwd for repo %s is not set.\n", repo_id);
-            g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_GENERAL,
+            g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_REPO_PASSWD_REQUIRED,
                          "Passwd is not set");
             ret = -1;
             goto out;
@@ -1013,7 +1014,7 @@ seaf_repo_manager_post_multi_files (SeafRepoManager *mgr,
                                                      repo_id, user,
                                                      key, iv) < 0) {
             seaf_warning ("Passwd for repo %s is not set.\n", repo_id);
-            g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_GENERAL,
+            g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_REPO_PASSWD_REQUIRED,
                          "Passwd is not set");
             ret = -1;
             goto out;
@@ -2756,7 +2757,7 @@ seaf_repo_manager_put_file (SeafRepoManager *mgr,
                                                      repo_id, user,
                                                      key, iv) < 0) {
             seaf_warning ("Passwd for repo %s is not set.\n", repo_id);
-            g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_GENERAL,
+            g_set_error (error, SEAFILE_DOMAIN, SEAF_ERR_REPO_PASSWD_REQUIRED,
                          "Passwd is not set");
             ret = -1;
             goto out;

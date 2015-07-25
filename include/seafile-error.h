@@ -18,5 +18,6 @@
 #define SEAF_ERR_REPO_LOCKED    514
 #define SEAF_ERR_DIR_MISSING    515
 #define SEAF_ERR_PATH_NO_EXIST  516 /* the dir or file pointed by this path not exists */
+#define SEAF_ERR_REPO_PASSWD_REQUIRED 517
 
 #endif
